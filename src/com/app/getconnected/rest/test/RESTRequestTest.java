@@ -1,286 +1,179 @@
 package com.app.getconnected.rest.test;
 
-import com.app.getconnected.rest.RESTRequestListener;
+import com.app.getconnected.network.Config;
+import com.app.getconnected.rest.RESTRequest;
 import com.app.getconnected.rest.RESTRequest.Method;
+import com.app.getconnected.rest.RESTRequestEvent;
+import com.app.getconnected.rest.RESTRequestListener;
 
 import android.test.AndroidTestCase;
 
-public class RESTRequestTest extends AndroidTestCase
+public class RESTRequestTest extends AndroidTestCase implements RESTRequestListener
 {
-	/**
-	 * 
-	 */
-	public RESTRequestTest()
-	{
-		System.out.println("Hoi");
-	}
-	
 	@Override
 	public void setUp()
 	{
-		System.out.println("Hai");
+		
 	}
 	
 	public void testPreconditions()
 	{
-		System.out.println("Hei");
+		
 	}
 	
 	@Override
 	public void tearDown()
 	{
-		System.out.println("BBQ");
+		
 	}
 	
 	/**
-	 * Test getting the address
+	 * Test getting the address.
 	 */
 	public void testGetAddress()
 	{
-		//return address;
+		RESTRequest restRequest = new RESTRequest("address");
+		
+		assertEquals("address", restRequest.getAddress());
 	}
 
 	/**
-	 * Test setting the address
+	 * Test setting the address.
 	 */
 	public void testSetAddress()
 	{
-		//this.address = address;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		restRequest.setAddress("address");
+		
+		assertEquals("address", restRequest.getAddress());
+		
+		restRequest.setAddress("");
+		
+		assertEquals("", restRequest.getAddress());
 	}
 	
 	/**
-	 * @return method
+	 * Test getting the method.
 	 */
 	public void testGetMethod()
 	{
-		//return method;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		assertEquals(RESTRequest.Method.GET, restRequest.getMethod());
 	}
 	
 	/**
-	 * @param method
+	 * Test setting the mehtod.
 	 */
 	public void testSetMethod()
 	{
-		//this.method = method;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		restRequest.setMethod(Method.PUT);
+		
+		assertEquals(RESTRequest.Method.PUT, restRequest.getMethod());
+		
+		restRequest.setMethod(Method.POST);
+		
+		assertEquals(RESTRequest.Method.POST, restRequest.getMethod());
+		
+		restRequest.setMethod(Method.GET);
+		
+		assertEquals(RESTRequest.Method.GET, restRequest.getMethod());
 	}
 	
 	/**
-	 * @return headerAcceptedData
+	 * Test getting the accepted data type.
 	 */
 	public void testGetHeaderAcceptedData()
 	{
-		//return headerAcceptedData;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		assertEquals(RESTRequest.HeaderAcceptedData.JSON.getHeaderAcceptedData(), restRequest.getHeaderAcceptedData());
 	}
 	
 	/**
-	 * @param headerAcceptedData
+	 * Test setting the accepted data type.
 	 */
 	public void testSetHeaderAcceptedData()
 	{
-		//this.headerAcceptedData = headerAcceptedData;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		restRequest.setHeaderAcceptedData(RESTRequest.HeaderAcceptedData.TEXT.getHeaderAcceptedData());
+		
+		assertEquals(RESTRequest.HeaderAcceptedData.TEXT.getHeaderAcceptedData(), restRequest.getHeaderAcceptedData());
+		
+		restRequest.setHeaderAcceptedData(RESTRequest.HeaderAcceptedData.XML.getHeaderAcceptedData());
+		
+		assertEquals(RESTRequest.HeaderAcceptedData.XML.getHeaderAcceptedData(), restRequest.getHeaderAcceptedData());
+		
+		restRequest.setHeaderAcceptedData(RESTRequest.HeaderAcceptedData.HTML.getHeaderAcceptedData());
+		
+		assertEquals(RESTRequest.HeaderAcceptedData.HTML.getHeaderAcceptedData(), restRequest.getHeaderAcceptedData());
+		
+		restRequest.setHeaderAcceptedData(RESTRequest.HeaderAcceptedData.JSON.getHeaderAcceptedData());
+		
+		assertEquals(RESTRequest.HeaderAcceptedData.JSON.getHeaderAcceptedData(), restRequest.getHeaderAcceptedData());
 	}
 	
 	/**
-	 * @return ID
+	 * Test getting the ID.
 	 */
 	public void testGetID()
 	{
-		//return ID;
+		RESTRequest restRequest = new RESTRequest("");
+		
+		assertEquals("", restRequest.getID());
 	}
 
 	/**
-	 * @param address
+	 * Test setting the ID.
 	 */
 	public void testSetID()
 	{
-		//this.ID = ID;
-	}
-	
-	/**
-	 * @param key
-	 * @param value
-	 */
-	public void testPutString()
-	{
-		//parameters.add(new BasicNameValuePair(key, value));
-	}
-	
-	/**
-	 * @param key
-	 * @param value
-	 */
-	public void testPutInt()
-	{
-		//parameters.add(new BasicNameValuePair(key, Integer.toString(value)));
-	}
-	
-	/**
-	 * @param key
-	 * @param value
-	 */
-	public void testPutDouble()
-	{
-		//parameters.add(new BasicNameValuePair(key, Double.toString(value)));
+		RESTRequest restRequest = new RESTRequest("");
+		
+		restRequest.setID("test");
+		
+		assertEquals("test", restRequest.getID());
+		
+		restRequest.setID("");
+		
+		assertEquals("", restRequest.getID());
 	}
 
 	/**
-	 * @param key
-	 * @param value
+	 * Test executing the asynchronous task.
 	 */
-	public void testPutFloat()
-	{
-		//parameters.add(new BasicNameValuePair(key, Float.toString(value)));
-	}
-	
-	/**
-	 * @param key
-	 * @param value
-	 */
-	public void testPutBoolean()
-	{
-		//parameters.add(new BasicNameValuePair(key, Boolean.toString(value)));
-	}
-	
-	/**
-	 * @param eventListener
-	 */
-	public void testAddEventListener()
-	{
-		//this.eventListeners.add(eventListener);
-	}
-	
 	protected void testDoInBackground()
 	{
-//		DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
-//
-//		HttpUriRequest httpRequest = null; 
-//		
-//		// Get the correct request method
-//		try
-//		{
-//			switch (method)
-//			{
-//				case GET:
-//					// Set URL and encode parameters
-//					httpRequest = new HttpGet(address + "?" + URLEncodedUtils.format(parameters, "utf-8"));
-//					break;
-//	
-//				case POST:
-//					httpRequest = new HttpPost(address);
-//					
-//					// Encode parameters as entity
-//					((HttpPost) httpRequest).setEntity(new UrlEncodedFormEntity(parameters));
-//					break;
-//					
-//				case PUT:
-//					httpRequest = new HttpPut(address);
-//					
-//					// Encode parameters as entity
-//					((HttpPut) httpRequest).setEntity(new UrlEncodedFormEntity(parameters));
-//					break;
-//					
-//				default:
-//					return "-1";
-//			}
-//		}
-//		catch (IllegalArgumentException e)
-//		{
-//			e.printStackTrace();
-//			return "-2";
-//		}
-//		catch (UnsupportedEncodingException e)
-//		{
-//			return "-3";
-//		}
-//		
-//		// Indicate what data needs to be received
-//		httpRequest.setHeader("Accept", headerAcceptedData);
-//
-//		InputStream inputStream = null;
-//		
-//		Scanner scanner = null;
-//		
-//		try
-//		{
-//			// Run request
-//			HttpResponse httpResponse = defaultHttpClient.execute(httpRequest);
-//			
-//			// Get content of response
-//			inputStream = httpResponse.getEntity().getContent();
-//			
-//			// Trick to read all data from a stream in one line: https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html
-//			scanner = new Scanner(inputStream).useDelimiter("\\A");
-//
-//			String result = "";
-//			
-//			// Read lines into result
-//			while (scanner.hasNext())
-//			{
-//				result += scanner.next();
-//			}
-//			
-//			if (result.length() > 0)
-//			{
-//				return result;
-//			}
-//		}
-//		catch (IOException e)
-//		{
-//			return "-4";
-//		}
-//		finally // Close opened utilities
-//		{
-//			if (scanner != null)
-//			{
-//				scanner.close();
-//			}
-//			
-//			if (inputStream != null)
-//			{
-//				try
-//				{
-//					inputStream.close();
-//				}
-//				catch (IOException e) { }
-//			}
-//		}
-//		
-//		return "-5";
+		
 	}
-	
-	protected void testOnPreExecute()
+
+	@Override
+	public void RESTRequestOnPreExecute(RESTRequestEvent event)
 	{
-//		super.onPreExecute();
-//		
-//		for (RESTRequestListener eventListener : eventListeners)
-//		{
-//			// Create new RESTRequestEvent to be handled by the event listener
-//			eventListener.RESTRequestOnPreExecute(new RESTRequestEvent(this, ID));
-//		}
+		
 	}
-	
-	protected void testOnProgressUpdate()
+
+	@Override
+	public void RESTRequestOnProgressUpdate(RESTRequestEvent event)
 	{
-//		super.onProgressUpdate(voids);
-//		
-//		for (RESTRequestListener eventListener : eventListeners)
-//		{
-//			// Create new RESTRequestEvent to be handled by the event listener
-//			eventListener.RESTRequestOnProgressUpdate(new RESTRequestEvent(this, ID));
-//		}
+		
 	}
-	
-	protected void testOnPostExecute()
+
+	@Override
+	public void RESTRequestOnPostExecute(RESTRequestEvent event)
 	{
-//		for (RESTRequestListener eventListener : eventListeners)
-//		{
-//			// Create new RESTRequestEvent to be handled by the event listener
-//			eventListener.RESTRequestOnPostExecute(new RESTRequestEvent(this, result, ID));
-//		}
+		
 	}
 	
+	/**
+	 * 
+	 */
 	public void testToString()
 	{
-		//return address + "?" + URLEncodedUtils.format(parameters, "utf-8");
+		
 	}
 }
