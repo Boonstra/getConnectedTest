@@ -1,4 +1,4 @@
-package com.app.getconnected.test;
+package com.util.getconnected.test;
 
 import android.test.AndroidTestCase;
 import com.util.getconnected.JSONParser;
