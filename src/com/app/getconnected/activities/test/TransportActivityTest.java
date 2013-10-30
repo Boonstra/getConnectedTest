@@ -51,6 +51,7 @@ public class TransportActivityTest extends
 
 		assertNotNull(inputFrom);
 		assertNotNull(inputTo);
+		
 		assertEquals(inputFrom.getHint(), transportActivity.getResources().getString(com.app.getconnected.R.string.transport_input_from));
 		assertEquals(inputTo.getHint(), transportActivity.getResources().getString(com.app.getconnected.R.string.transport_input_to));
 		
