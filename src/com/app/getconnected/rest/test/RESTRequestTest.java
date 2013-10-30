@@ -1,5 +1,11 @@
 package com.app.getconnected.rest.test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.app.getconnected.network.Config;
 import com.app.getconnected.rest.RESTRequest;
 import com.app.getconnected.rest.RESTRequest.Method;
@@ -10,6 +16,17 @@ import android.test.AndroidTestCase;
 
 public class RESTRequestTest extends AndroidTestCase implements RESTRequestListener
 {
+	/**
+	 * The CountDownLatch is used to wait for the asynchronous task to finish before
+	 * continuing the RESTRequestTest.
+	 */
+	protected CountDownLatch doInBackGroundCountDownLatch;
+	
+	/**
+	 * A boolean indicating whether or not a RESTRequest was executed successfully.
+	 */
+	protected boolean doInBackgroundRESTRequestSuccessfull;
+	
 	@Override
 	public void setUp()
 	{
@@ -146,34 +163,89 @@ public class RESTRequestTest extends AndroidTestCase implements RESTRequestListe
 	/**
 	 * Test executing the asynchronous task.
 	 */
-	protected void testDoInBackground()
+	public void testDoInBackground()
 	{
+		// The CountDownLatch is used to wait for the RESTRequest to finish
+		doInBackGroundCountDownLatch = new CountDownLatch(1);
 		
+		doInBackgroundRESTRequestSuccessfull = false;
+		
+		RESTRequest restRequest = new RESTRequest(Config.tripPlannerAddress);
+		
+		restRequest.addEventListener(this);
+		
+		restRequest.execute();
+		
+	    try
+		{
+	    	// Wait until the count down is finished by either the RESTRequest having finished, or the 30 seconds running out
+			doInBackGroundCountDownLatch.await(30, TimeUnit.SECONDS);
+		}
+	    catch (InterruptedException e)
+		{
+	    	e.printStackTrace();
+	    	
+	    	// Fail test on Exception
+			assertFalse(true);
+		}
+
+	    assertTrue(doInBackgroundRESTRequestSuccessfull);
 	}
 
 	@Override
 	public void RESTRequestOnPreExecute(RESTRequestEvent event)
 	{
-		
+		assertEquals("", event.getID());
+		assertEquals("", event.getResult());
 	}
 
 	@Override
 	public void RESTRequestOnProgressUpdate(RESTRequestEvent event)
 	{
-		
+		assertEquals("", event.getID());
+		assertEquals("", event.getResult());
 	}
 
 	@Override
 	public void RESTRequestOnPostExecute(RESTRequestEvent event)
 	{
+		assertEquals("", event.getID());
 		
+		String result = event.getResult();
+		
+		assertFalse("".equals(result));
+		
+		try
+		{
+			JSONObject jsonObject = new JSONObject(result);
+			
+			JSONObject errorJSONObject = jsonObject.getJSONObject("error");
+
+			assertEquals(500, errorJSONObject.getInt("id"));
+			
+			assertTrue(errorJSONObject.getBoolean("noPath"));
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+			
+			assertTrue(false);
+		}
+		
+		doInBackgroundRESTRequestSuccessfull = true;
+		
+		doInBackGroundCountDownLatch.countDown();
 	}
 	
 	/**
-	 * 
+	 * Test the toString method
 	 */
 	public void testToString()
 	{
+		RESTRequest restRequest = new RESTRequest(Config.tripPlannerAddress);
 		
+		restRequest.putString("test", "success");
+		
+		assertEquals(Config.tripPlannerAddress + "?test=success", restRequest.toString());
 	}
 }
