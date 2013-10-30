@@ -16,16 +16,23 @@ import android.test.AndroidTestCase;
 
 public class RESTRequestTest extends AndroidTestCase implements RESTRequestListener
 {
-	/**
-	 * The CountDownLatch is used to wait for the asynchronous task to finish before
-	 * continuing the RESTRequestTest.
-	 */
-	protected CountDownLatch doInBackGroundCountDownLatch;
+	/** The CountDownLatch is used by the testAbort method to wait for the asynchronous task to finish before continuing the RESTRequestTest. */
+	protected CountDownLatch testAbortCountDownLatch;
 	
-	/**
-	 * A boolean indicating whether or not a RESTRequest was executed successfully.
-	 */
-	protected boolean doInBackgroundRESTRequestSuccessfull;
+	/** An integer indicating how many RESTRequests initiated by the testAbort method were executed successfully. */
+	protected int testAbortFinishedRESTRequests = 0;
+	
+	/** Identifier for the testDoInBackground method. */
+	protected final String TEST_ABORT_ID = "testAbort";
+	
+	/** The CountDownLatch is used by the testDoInBackground method to wait for the asynchronous task to finish before continuing the RESTRequestTest. */
+	protected CountDownLatch testDoInBackgroundCountDownLatch;
+	
+	/** A boolean indicating whether or not a RESTRequest initiated by the testDoInBackground method was executed successfully. */
+	protected boolean testDoInBackgroundRESTRequestSuccessfull;
+	
+	/** Identifier for the testDoInBackground method. */
+	protected final String TEST_DO_IN_BACKGROUND_ID = "testDoInBackground";
 	
 	@Override
 	public void setUp()
@@ -159,27 +166,35 @@ public class RESTRequestTest extends AndroidTestCase implements RESTRequestListe
 		
 		assertEquals("", restRequest.getID());
 	}
-
+	
 	/**
-	 * Test executing the asynchronous task.
+	 * Test aborting an executing asynchronous task
 	 */
-	public void testDoInBackground()
+	public void testAbort()
 	{
 		// The CountDownLatch is used to wait for the RESTRequest to finish
-		doInBackGroundCountDownLatch = new CountDownLatch(1);
+		testAbortCountDownLatch = new CountDownLatch(1);
 		
-		doInBackgroundRESTRequestSuccessfull = false;
+		testAbortFinishedRESTRequests = 0;
 		
-		RESTRequest restRequest = new RESTRequest(Config.tripPlannerAddress);
+		RESTRequest restRequest1 = new RESTRequest(Config.tripPlannerAddress, TEST_ABORT_ID);
+		RESTRequest restRequest2 = new RESTRequest(Config.tripPlannerAddress, TEST_ABORT_ID);
+		RESTRequest restRequest3 = new RESTRequest(Config.tripPlannerAddress, TEST_ABORT_ID);
 		
-		restRequest.addEventListener(this);
+		restRequest1.addEventListener(this);
+		restRequest2.addEventListener(this);
+		restRequest3.addEventListener(this);
 		
-		restRequest.execute();
+		restRequest1.execute();
+		restRequest2.execute();
+		restRequest3.execute();
+		
+		restRequest1.abort();
 		
 	    try
 		{
 	    	// Wait until the count down is finished by either the RESTRequest having finished, or the 30 seconds running out
-			doInBackGroundCountDownLatch.await(30, TimeUnit.SECONDS);
+	    	testAbortCountDownLatch.await(30, TimeUnit.SECONDS);
 		}
 	    catch (InterruptedException e)
 		{
@@ -189,52 +204,90 @@ public class RESTRequestTest extends AndroidTestCase implements RESTRequestListe
 			assertFalse(true);
 		}
 
-	    assertTrue(doInBackgroundRESTRequestSuccessfull);
+	    assertEquals(2, testAbortFinishedRESTRequests);
+	}
+
+	/**
+	 * Test executing the asynchronous task.
+	 */
+	public void testDoInBackground()
+	{
+		// The CountDownLatch is used to wait for the RESTRequest to finish
+		testDoInBackgroundCountDownLatch = new CountDownLatch(1);
+		
+		testDoInBackgroundRESTRequestSuccessfull = false;
+		
+		RESTRequest restRequest = new RESTRequest(Config.tripPlannerAddress, TEST_DO_IN_BACKGROUND_ID);
+		
+		restRequest.addEventListener(this);
+		
+		restRequest.execute();
+		
+	    try
+		{
+	    	// Wait until the count down is finished by either the RESTRequest having finished, or the 30 seconds running out
+	    	testDoInBackgroundCountDownLatch.await(30, TimeUnit.SECONDS);
+		}
+	    catch (InterruptedException e)
+		{
+	    	e.printStackTrace();
+	    	
+	    	// Fail test on Exception
+			assertFalse(true);
+		}
+
+	    assertTrue(testDoInBackgroundRESTRequestSuccessfull);
 	}
 
 	@Override
-	public void RESTRequestOnPreExecute(RESTRequestEvent event)
-	{
-		assertEquals("", event.getID());
-		assertEquals("", event.getResult());
-	}
+	public void RESTRequestOnPreExecute(RESTRequestEvent event) { }
 
 	@Override
-	public void RESTRequestOnProgressUpdate(RESTRequestEvent event)
-	{
-		assertEquals("", event.getID());
-		assertEquals("", event.getResult());
-	}
+	public void RESTRequestOnProgressUpdate(RESTRequestEvent event) { }
 
 	@Override
 	public void RESTRequestOnPostExecute(RESTRequestEvent event)
 	{
-		assertEquals("", event.getID());
-		
-		String result = event.getResult();
-		
-		assertFalse("".equals(result));
-		
-		try
+		if (event.getID().equals(TEST_DO_IN_BACKGROUND_ID))
 		{
-			JSONObject jsonObject = new JSONObject(result);
+			assertEquals("", event.getID());
 			
-			JSONObject errorJSONObject = jsonObject.getJSONObject("error");
-
-			assertEquals(500, errorJSONObject.getInt("id"));
+			String result = event.getResult();
 			
-			assertTrue(errorJSONObject.getBoolean("noPath"));
+			assertFalse("".equals(result));
+			
+			try
+			{
+				JSONObject jsonObject = new JSONObject(result);
+				
+				JSONObject errorJSONObject = jsonObject.getJSONObject("error");
+	
+				assertEquals(500, errorJSONObject.getInt("id"));
+				
+				assertTrue(errorJSONObject.getBoolean("noPath"));
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+				
+				assertTrue(false);
+			}
+			
+			testDoInBackgroundRESTRequestSuccessfull = true;
+			
+			testDoInBackgroundCountDownLatch.countDown();
 		}
-		catch (JSONException e)
+		else if (event.getID().equals(TEST_ABORT_ID))
 		{
-			e.printStackTrace();
+			testAbortFinishedRESTRequests++;
 			
-			assertTrue(false);
+			testDoInBackgroundCountDownLatch.countDown();
 		}
-		
-		doInBackgroundRESTRequestSuccessfull = true;
-		
-		doInBackGroundCountDownLatch.countDown();
+		else
+		{
+			// ID was incorrectly set
+			assertFalse(true);
+		}
 	}
 	
 	/**
