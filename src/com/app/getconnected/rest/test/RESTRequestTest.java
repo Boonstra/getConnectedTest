@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.app.getconnected.network.Config;
+import com.app.getconnected.config.Config;
 import com.app.getconnected.rest.RESTRequest;
 import com.app.getconnected.rest.RESTRequest.Method;
 import com.app.getconnected.rest.RESTRequestEvent;
