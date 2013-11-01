@@ -1,22 +1,20 @@
 package com.app.getconnected.activities.test;
 
-import com.app.getconnected.activities.TransportActivity;
+import com.app.getconnected.activities.TransportActivity2;
 import com.app.getconnected.network.GeoLocation;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 public class TransportActivityTest extends
-		ActivityInstrumentationTestCase2<TransportActivity> {
+		ActivityInstrumentationTestCase2<TransportActivity2> {
 
-	private TransportActivity transportActivity;
+	private TransportActivity2 transportActivity;
 
 	@SuppressWarnings("deprecation")
 	public TransportActivityTest() {
 		super("com.app.getconnected.activities.TransportActivity",
-				TransportActivity.class);
+				TransportActivity2.class);
 	}
 
 	@Override

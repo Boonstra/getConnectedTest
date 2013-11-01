@@ -31,7 +31,7 @@ public class GPSLocatorTest extends AndroidTestCase {
 	
 	public void testGPSCoordinates() {
 		
-		//Test Zernikeplein: 53.24083, 6.53280;
+		//Test Zernikeplein, Groningen: 53.24083, 6.53280;
 		assertTrue(locator.getLatitude() > 50);
 		assertTrue(locator.getLatitude() < 60);
 		assertTrue(locator.getLongitude() > 5);
